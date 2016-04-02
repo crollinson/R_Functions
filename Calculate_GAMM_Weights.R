@@ -1,4 +1,4 @@
-factor.weights <- function(model.gam, model.name, newdata, extent, vars, limiting=F){
+factor.weights <- function(model.gam, model.name, newdata, vars, limiting=F){
   # Limiting = T/F; if true, our weights are based on what is most limiting.  If false (default), based on what is is most influential
 
   # If the model.gam is a mixed model.gam (gamm) rather than a normal gam, extract just the gam portion
@@ -58,12 +58,11 @@ factor.weights <- function(model.gam, model.name, newdata, extent, vars, limitin
 	# Factor weights are determined by the relative strength of Temp, Precip, & CO2
 	df.weights <- data.frame(Model=model.name, 
 	                         Site=newdata$Site, 
-	                         Extent=newdata$Extent, 
-	                         Resolution=newdata$Resolution, 
 	                         Year=newdata$Year, 
 	                         fit.full=fit)
 
- 	if("PlotID" %in% names(newdata)) df.weights$PlotID <- newdata$PlotID
+  if("PlotID" %in% names(newdata)) df.weights$PlotID <- newdata$PlotID
+  if("PlotID" %in% names(newdata)) df.weights$PlotID <- newdata$PlotID
 	if("TreeID" %in% names(newdata)) df.weights$TreeID <- newdata$TreeID
 	if("PFT"    %in% names(newdata)) df.weights$PFT    <- newdata$PFT
 

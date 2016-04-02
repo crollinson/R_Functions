@@ -1,4 +1,4 @@
-post.distns <- function(model.gam, model.name, newdata, vars, n, terms=T, PFT=F, lwr=0.025, upr=0.975){
+post.distns <- function(model.gam, model.name, newdata, vars, n, terms=T, PFT=F, lwr=0.025, upr=0.975, return.sims=F){
 	# Note: this function can be used to generate a 95% CI on the full model.gam OR terms
 
 	# -----------
@@ -103,10 +103,13 @@ post.distns <- function(model.gam, model.name, newdata, vars, n, terms=T, PFT=F,
 
 	}
 
-	
-	out <- list()
-	out[["ci"]]	 <- df.out
-	out[["sims"]] <- df.sim
+	if(return.sims==T){
+	  out <- list()
+	  out[["ci"]]	 <- df.out
+	  out[["sims"]] <- df.sim
+	} else {
+    out <- df.out
+	}
 			
 	return(out)
 }
