@@ -51,7 +51,7 @@ post.distns <- function(model.gam, model.name, newdata, vars, n, terms=T, PFT=F,
 
 			if(v == vars[1]) df.out <- df.tmp else df.out <- rbind(df.out, df.tmp)
 
-  			# Creating a data frame storing all the simulations for more robust analyses
+  		# Creating a data frame storing all the simulations for more robust analyses
 			sim.tmp$Model       <- model.name
 			sim.tmp$Effect      <- v
 			sim.tmp$x           <- newdata[,v]
