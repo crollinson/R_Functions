@@ -55,13 +55,22 @@ calc.derivs <- function(model.gam, newdata, vars, n=100, eps=1e-7, alpha=0.05, l
     sim.upr <- apply(sim.tmp, 1, quantile, upr)
     sig <- as.factor(ifelse(sim.lwr*sim.upr>0, "*", "NA"))
     
-    df.tmp <- data.frame(df.model, 
+    df.tmp <- data.frame(newdata, 
                          mean=sim.mean,
                          lwr=sim.lwr,
                          upr=sim.upr,
-                         sig=sig)
+                         sig=sig,
+                         var=as.factor(v))
     
-    if(v == vars[1]) df.out <- df.tmp else df.out <- rbind(df.out, df.tmp)
+    sim.tmp$var <- as.factor(v)
+    
+    if(v == vars[1]){ 
+      df.out <- df.tmp 
+      df.sim <- sim.tmp
+    } else {
+      df.out <- rbind(df.out, df.tmp)
+      df.sim <- rbind(df.sim, sim.tmp)
+    }
     
   }
   if(return.sims==T){
