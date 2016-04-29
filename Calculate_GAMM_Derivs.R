@@ -53,7 +53,7 @@ calc.derivs <- function(model.gam, newdata, vars, n=100, eps=1e-7, alpha=0.05, l
     sim.mean <- apply(sim.tmp, 1, mean)
     sim.lwr <- apply(sim.tmp, 1, quantile, lwr)
     sim.upr <- apply(sim.tmp, 1, quantile, upr)
-    sig <- as.factor(ifelse(sim.lwr*sim.upr>0, "*", "NA"))
+    sig <- as.factor(ifelse(sim.lwr*sim.upr>0, "*", NA))
     
     df.tmp <- data.frame(newdata, 
                          mean=sim.mean,
