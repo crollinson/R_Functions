@@ -30,7 +30,7 @@ factor.weights <- function(model.gam, model.name, newdata, vars, limiting=F){
 		gam.fits[,"intercept"] <- as.vector(Xp[,cols.list[["Site"]]]   %*% coef.gam[cols.list[["Site"]]] )
 
 	} else if(length(cols.list[["Site"]])==1) {
-		gam.fits[["intercept"]] <- as.vector(t(Xp[,cols.list[["Site"]]]    *  coef.gam[cols.list[["Site"]]])) # Note: no matrix multiplication because it's 1 x 1
+		gam.fits[,"intercept"] <- as.vector(t(Xp[,cols.list[["Site"]]]    *  coef.gam[cols.list[["Site"]]])) # Note: no matrix multiplication because it's 1 x 1
 	}
 
   vars.num <- vector()    
@@ -65,7 +65,9 @@ factor.weights <- function(model.gam, model.name, newdata, vars, limiting=F){
   if("PlotID" %in% names(newdata)) df.weights$PlotID <- newdata$PlotID
 	if("TreeID" %in% names(newdata)) df.weights$TreeID <- newdata$TreeID
 	if("PFT"    %in% names(newdata)) df.weights$PFT    <- newdata$PFT
-
+  
+	df.weights[,"fit.intercept"] <- gam.fits[,"intercept"]
+	df.weights[,"sd.intercept" ] <- gam.sd  [,"intercept"]
 	for(v in vars){
 		df.weights[,paste("fit", v, sep=".")   ] <- gam.fits[,v]
 		df.weights[,paste( "sd", v, sep=".")   ] <- gam.sd[,v]
