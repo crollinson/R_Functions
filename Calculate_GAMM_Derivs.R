@@ -16,9 +16,10 @@ calc.derivs <- function(model.gam, newdata, vars, n=100, eps=1e-7, alpha=0.05, l
   
   # If we're interested in an even split to our upper & lower bounds based on our alpha (upper/lower not specified), 
   # calculate them here
-  if(is.null(lwr) & is.null(upr)) lwr=alpha/2; upr= 1-alpha/2
+  if(is.null(lwr) & is.null(upr)){ lwr=alpha/2; upr= 1-alpha/2 }
   
-  coef.gam <- coef(model.gam)
+  # Determining what the terms in our model are
+  m.terms <- attr(terms(model.gam), "term.labels")
   
   # finding which columns are numeric
   df.model <- model.frame(model.gam)
@@ -27,24 +28,29 @@ calc.derivs <- function(model.gam, newdata, vars, n=100, eps=1e-7, alpha=0.05, l
     if(is.numeric(df.model[,j])) cols.num <- c(cols.num, names(df.model)[j])
   }
   
+  # Generate a random distribution of betas using the covariance matrix
+  coef.gam <- coef(model.gam)
+  Rbeta <- mvrnorm(n=n, model.gam$coefficients, model.gam$Vp)
+  
   # From derivFun.R, "Deriv"
-  # Create the prediction matrix
+  # Create the prediction matrices
   X0 <- predict(model.gam, newdata=newdata, type="lpmatrix")
   
+  # Create a new data frame where the numbers are shifted just a bit 
+  #  so we can look at the difference (i.e. slope)
   newD <- newdata
-  newD[,cols.num] <- newdata[,cols.num]+eps
+  newD[,m.terms[m.terms %in% cols.num]] <- newdata[,m.terms[m.terms %in% cols.num]]+eps
   
   X1 <- predict(model.gam, newdata=newD, type="lpmatrix")
-  Xp <- (X1 - X0) / eps
+  
+  # Getting the "finite difference approximation of the first derivative"
+  Xp <- (X1 - X0) / eps # Change in Y per unit X
   Xp.r <- NROW(Xp)
   Xp.c <- NCOL(Xp)
   
-  # Generate a random distribution of betas using the covariance matrix
-  Rbeta <- mvrnorm(n=n, coef(model.gam), vcov(model.gam))
-  
   for(v in vars) {
-    Xi <- Xp * 0
-    want <- which(substr(names(coef.gam),1,(nchar(v)+3))==paste0("s(",v,")"))
+    Xi <- Xp * 0 # zeroing out our data frame 
+    want <- which(substr(names(coef.gam),1,(nchar(v)+3))==paste0("s(",v,")")) # Finding which columns belong to this factor
     Xi[, want] <- Xp[, want]
     df <- Xi %*% coef(model.gam)
     
