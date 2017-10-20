@@ -7,7 +7,13 @@ post.distns <- function(model.gam, model.name, newdata, vars, n, terms=T, PFT=F,
 	# http://www.fromthebottomoftheheap.net/2011/06/12/additive-modelling-and-the-hadcrut3v-global-mean-temperature-series/
 	# His handy-dandy functions can be found here: https://github.com/gavinsimpson/random_code/
 	#      Including the derivative funcition that will probably come in handy later
-	# -----------
+  # March 2017: Gavin updated his blog posts to correct his confidence interval methodology:
+  #    http://www.fromthebottomoftheheap.net/2016/12/15/simultaneous-interval-revisited/
+  #    http://www.fromthebottomoftheheap.net/2017/03/21/simultaneous-intervals-for-derivatives-of-smooths/
+  #  - NOTE: I don't think this makes a difference for me because I've always been working with full simulations, so I
+  #          *think* I've basically been doing the simultaneous interval.  Gavin's way would be less memory intensive, 
+  #          but I like my way.
+  # -----------
 	library(MASS)
 	set.seed(321)
 
