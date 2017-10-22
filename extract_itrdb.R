@@ -82,7 +82,7 @@ extract.itrdb <- function(area.extract=NULL, download.types=c("Chronology", "Raw
     
     if(nrow(data.urls)==0) next 
     for(j in 1:nrow(data.urls)){
-      download.file(data.urls$fileUrl[j], file.path(dir.out, data.urls$linkText[j]), quiet=T)
+      download.file(data.urls$fileUrl[j], file.path(dir.out, site.dat$studyCode, data.urls$linkText[j]), quiet=T)
     } # End looping thorugh URL types
     
   
