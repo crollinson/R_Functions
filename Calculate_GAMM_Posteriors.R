@@ -1,4 +1,13 @@
-post.distns <- function(model.gam, model.name, newdata, vars, n, terms=T, PFT=F, lwr=0.025, upr=0.975, return.sims=F){
+##' @param model.gam - a GAM or GAMM object 
+##' @param newdata - the data to be used for predicting the posterior distributions
+##' @param vars - the spline predictors to be simulated
+##' @param n - number of simulations to be generated for the posterior distribution; defaults to 1000
+##' @param terms - (logical) only model the spline parameters and make separate predictions for each var (do not include intercepts); defaults to T
+##' @param lwr - lower bound for confidence interval; default = 0.025 (lower end of 2-tailed 95% CI)
+##' @param upr - upper bound for confidence interval; default = 0.975 (upper end of 2-tailed 95% CI)
+##' @param return.sims - (logical) store and return the raw posterior simulations? defaults to F
+
+post.distns <- function(model.gam, newdata, vars, n=1000, terms=F, lwr=0.025, upr=0.975, return.sims=F){
 	# Note: this function can be used to generate a 95% CI on the full model.gam OR terms
 
 	# -----------
@@ -41,8 +50,7 @@ post.distns <- function(model.gam, model.name, newdata, vars, n, terms=T, PFT=F,
 			sim.tmp <- data.frame(Xp[,cols.list[[v]]] %*% t(Rbeta[,cols.list[[v]]]) )
 
 			# Saving the quantiles into a data frame
-			df.tmp <- data.frame(Model  = model.name, 
-                           Effect = v, 
+			df.tmp <- data.frame(Effect = v, 
                            x      = newdata[,v],
 							             mean   = apply(sim.tmp, 1, mean), 
 							             lwr    = apply(sim.tmp, 1, quantile, lwr, na.rm=T), 
@@ -58,7 +66,6 @@ post.distns <- function(model.gam, model.name, newdata, vars, n, terms=T, PFT=F,
 			if(v == vars[1]) df.out <- df.tmp else df.out <- rbind(df.out, df.tmp)
 
   		# Creating a data frame storing all the simulations for more robust analyses
-			sim.tmp$Model       <- model.name
 			sim.tmp$Effect      <- v
 			sim.tmp$x           <- newdata[,v]
 
@@ -78,8 +85,7 @@ post.distns <- function(model.gam, model.name, newdata, vars, n, terms=T, PFT=F,
 	} else {
 		sim1 <- Xp %*% t(Rbeta) # simulates n predictions of the response variable in the model.gam
 		
-		df.out <- data.frame(Model      = model.name, 
-		                     mean       = apply(sim1, 1, mean, na.rm=T), 
+		df.out <- data.frame(mean       = apply(sim1, 1, mean, na.rm=T), 
 		                     lwr        = apply(sim1, 1, quantile, lwr, na.rm=T), 
 		                     upr        = apply(sim1, 1, quantile, upr, na.rm=T))
 
@@ -91,7 +97,7 @@ post.distns <- function(model.gam, model.name, newdata, vars, n, terms=T, PFT=F,
 		if("TreeID"     %in% names(newdata)) df.out$TreeID     <- newdata$TreeID
 		if("PFT"        %in% names(newdata)) df.out$PFT        <- newdata$PFT
 
-		df.sim <- data.frame(Model      = rep(model.name, nrow(newdata)))
+		df.sim <- data.frame(X      = 1:nrow(newdata))
 
 		if("Site"       %in% names(newdata)) df.sim$Site       <- newdata$Site
 		if("Extent"     %in% names(newdata)) df.sim$Extent     <- newdata$Extent
