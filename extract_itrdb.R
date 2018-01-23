@@ -45,7 +45,7 @@ extract.itrdb <- function(area.extract=NULL, download.types=c("Chronology", "Raw
     # Download and save the XML document with all of the metadata for the site
     # We can extract info from this site for our use later
     site.dat <- jsonlite::fromJSON(paste0("https://www.ncdc.noaa.gov/paleo-search/study/search.json?xmlId=", id.xml))$study
-    summary(site.dat)
+    # summary(site.dat)
     
     # itrdb.metadata[i,"investigators" ]  <- site.dat$investigators
     site.coords <- rev(as.numeric(site.dat$site[[1]]$geo$geometry$coordinates[[1]]))
@@ -82,7 +82,7 @@ extract.itrdb <- function(area.extract=NULL, download.types=c("Chronology", "Raw
     
     if(nrow(data.urls)==0) next 
     for(j in 1:nrow(data.urls)){
-      download.file(data.urls$fileUrl[j], file.path(dir.out, site.dat$studyCode, data.urls$linkText[j]), quiet=T)
+      download.file(data.urls$fileUrl[j], file.path(dir.out, data.urls$linkText[j]), quiet=T)
     } # End looping thorugh URL types
     
   
