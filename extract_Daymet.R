@@ -20,7 +20,7 @@
 ##' # Code    | Units        | Description
 ##' # ------- | ------------ | --------------------------
 ##' # dayl    | seconds      | day length in seconds
-##' # prcp    | mm/day       | daily total preciptiation
+##' # prcp    | mm/day       | daily total precipitation
 ##' # srad    | W/m2         | daylight; mean incident shortwave radiation
 ##' # swe     | kg/m2(/day?) | snow water equivalent (if precip is rain; swe = prcp)
 ##' # tmax    | C            | daily maximum temperature
