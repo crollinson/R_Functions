@@ -1,4 +1,4 @@
-extract.itrdb <- function(area.extract=NULL, download.types=c("Chronology", "Raw Measurements", "Correlation Stats"), dir.out){
+extract.itrdb <- function(area.extract=NULL, download.types=c("Chronology", "Raw Measurements", "Correlation Stats"), species=NULL, dir.out){
   library(curl)
   library(XML)
   library(stringr)
@@ -54,17 +54,30 @@ extract.itrdb <- function(area.extract=NULL, download.types=c("Chronology", "Raw
     
     if(in.poly==FALSE) next
     
+    # Extract the species info where available 
+    if(is.null(species)){
+      if(length(site.dat$site[[1]]$paleoData[[1]]$species[[1]])>0){
+        noaa.meta[i,"species.code"   ]  <- site.dat$site[[1]]$paleoData[[1]]$species[[1]]$speciesCode
+        noaa.meta[i,"species.name"   ]  <- site.dat$site[[1]]$paleoData[[1]]$species[[1]]$scientificName
+      }
+    } else {
+      if(length(site.dat$site[[1]]$paleoData[[1]]$species[[1]])==0) next
+      
+      is.spp <- length(grep(tolower(species), tolower(site.dat$site[[1]]$paleoData[[1]]$species[[1]]$scientificName)))>0
+      
+      if(!is.spp) next
+
+      noaa.meta[i,"species.code"   ]  <- site.dat$site[[1]]$paleoData[[1]]$species[[1]]$speciesCode
+      noaa.meta[i,"species.name"   ]  <- site.dat$site[[1]]$paleoData[[1]]$species[[1]]$scientificName
+    }
+    
+    
     noaa.meta[i ,"studyCode"] <- site.dat$studyCode
     noaa.meta[i, "siteName" ] <- site.dat$site[[1]]$siteName
     noaa.meta[i, "Longitude"] <- site.coords[1]
     noaa.meta[i, "Latitude" ] <- site.coords[2]
     noaa.meta[i, "Elevation"] <- mean(as.numeric(site.dat$site[[1]]$geo$properties[,c("minElevationMeters", "maxElevationMeters")]))
     
-    # Extract the species info where available
-    if(length(site.dat$site[[1]]$paleoData[[1]]$species[[1]])>0){
-      noaa.meta[i,"species.code"   ]  <- site.dat$site[[1]]$paleoData[[1]]$species[[1]]$speciesCode
-      noaa.meta[i,"species.name"   ]  <- site.dat$site[[1]]$paleoData[[1]]$species[[1]]$scientificName
-    }
     
     
   
@@ -95,5 +108,5 @@ extract.itrdb <- function(area.extract=NULL, download.types=c("Chronology", "Raw
   noaa.meta$siteName     <- as.factor(noaa.meta$siteName)
   # summary(noaa.meta)
   
-  return(noaa.meta)
+  return(droplevels(noaa.meta))
 }
