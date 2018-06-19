@@ -53,12 +53,19 @@ extract.itrdb <- function(area.extract=NULL, download.types=c("Chronology", "Raw
     in.poly <- !is.na(over(site.sp, area.extract)[1])
     
     if(in.poly==FALSE) next
+    if(length(site.dat$site[[1]]$siteName)>2) next # Skip things like the NADA that have MANY sites 
     
     # Extract the species info where available 
     if(is.null(species)){
       if(length(site.dat$site[[1]]$paleoData[[1]]$species[[1]])>0){
-        noaa.meta[i,"species.code"   ]  <- site.dat$site[[1]]$paleoData[[1]]$species[[1]]$speciesCode
-        noaa.meta[i,"species.name"   ]  <- site.dat$site[[1]]$paleoData[[1]]$species[[1]]$scientificName
+        if(length(site.dat$site[[1]]$paleoData[[1]]$species[[1]])==1){
+          noaa.meta[i,"species.code"   ]  <- site.dat$site[[1]]$paleoData[[1]]$species[[1]]$speciesCode
+          noaa.meta[i,"species.name"   ]  <- site.dat$site[[1]]$paleoData[[1]]$species[[1]]$scientificName
+        } else { 
+          # Multiple species chronologies
+          noaa.meta[i,"species.code"   ]  <- paste(site.dat$site[[1]]$paleoData[[1]]$species[[1]]$speciesCode, collapse="-")
+          noaa.meta[i,"species.name"   ]  <- paste(site.dat$site[[1]]$paleoData[[1]]$species[[1]]$scientificName, collapse="-")
+        }
       }
     } else {
       if(length(site.dat$site[[1]]$paleoData[[1]]$species[[1]])==0) next
