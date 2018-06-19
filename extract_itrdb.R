@@ -53,7 +53,10 @@ extract.itrdb <- function(area.extract=NULL, download.types=c("Chronology", "Raw
     in.poly <- !is.na(over(site.sp, area.extract)[1])
     
     if(in.poly==FALSE) next
-    if(length(site.dat$site[[1]]$siteName)>2) next # Skip things like the NADA that have MANY sites 
+    if(length(site.dat$site[[1]]$siteName)>2){
+      warning(paste("Network with >2 sites attached; skipping!  Study Code:", site.dat$studyCode))
+      next # Skip things like the NADA that have MANY sites 
+    } 
     
     # Extract the species info where available 
     if(is.null(species)){
@@ -78,16 +81,17 @@ extract.itrdb <- function(area.extract=NULL, download.types=c("Chronology", "Raw
       noaa.meta[i,"species.name"   ]  <- site.dat$site[[1]]$paleoData[[1]]$species[[1]]$scientificName
     }
     
-    
+    # Study metadata
     noaa.meta[i ,"studyCode"] <- site.dat$studyCode
-    noaa.meta[i, "siteName" ] <- site.dat$site[[1]]$siteName
+    if(length(site.dat$site[[1]]$siteName)==1){
+      noaa.meta[i, "siteName" ] <- site.dat$site[[1]]$siteName
+    } else {
+      noaa.meta[i, "siteName" ] <- paste(site.dat$site[[1]]$siteName, collapse = " - ")
+    }
     noaa.meta[i, "Longitude"] <- site.coords[1]
     noaa.meta[i, "Latitude" ] <- site.coords[2]
     noaa.meta[i, "Elevation"] <- mean(as.numeric(site.dat$site[[1]]$geo$properties[,c("minElevationMeters", "maxElevationMeters")]))
-    
-    
-    
-  
+
     # Extract for the start/end dates
     noaa.meta[i,"yr.min"] <- as.numeric(site.dat$earliestYearCE)
     noaa.meta[i,"yr.max"] <- as.numeric(site.dat$mostRecentYearCE)
