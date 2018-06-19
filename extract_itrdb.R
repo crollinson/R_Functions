@@ -47,6 +47,13 @@ extract.itrdb <- function(area.extract=NULL, download.types=c("Chronology", "Raw
     site.dat <- jsonlite::fromJSON(paste0("https://www.ncdc.noaa.gov/paleo-search/study/search.json?xmlId=", id.xml))$study
     # summary(site.dat)
     
+    # Going through the URLs to find a the file types we want
+    # NOTE: Doing this now so we don't waste our time with everything that follows if it's pointless
+    site.dat2 <- site.dat$site[[1]]$paleoData[[1]]$dataFile[[1]]
+    data.urls <- site.dat2[site.dat2$urlDescription %in% download.types,]
+    if(nrow(data.urls)==0) next 
+    
+    
     # itrdb.metadata[i,"investigators" ]  <- site.dat$investigators
     site.coords <- rev(as.numeric(site.dat$site[[1]]$geo$geometry$coordinates[[1]]))
     site.sp <- SpatialPoints(coords = matrix(site.coords, ncol=2), proj4string=CRS(projection(area.extract)))
@@ -90,21 +97,14 @@ extract.itrdb <- function(area.extract=NULL, download.types=c("Chronology", "Raw
     }
     noaa.meta[i, "Longitude"] <- site.coords[1]
     noaa.meta[i, "Latitude" ] <- site.coords[2]
-    noaa.meta[i, "Elevation"] <- mean(as.numeric(site.dat$site[[1]]$geo$properties[,c("minElevationMeters", "maxElevationMeters")]))
+    noaa.meta[i, "Elevation"] <- mean(as.numeric(c(site.dat$site[[1]]$geo$properties$minElevationMeters, site.dat$site[[1]]$geo$properties$maxElevationMeters)))
 
     # Extract for the start/end dates
     noaa.meta[i,"yr.min"] <- as.numeric(site.dat$earliestYearCE)
     noaa.meta[i,"yr.max"] <- as.numeric(site.dat$mostRecentYearCE)
     
-    # Going through the URLs to find a .rwl file
-    site.dat <- site.dat$site[[1]]$paleoData[[1]]$dataFile[[1]]
-    
-    data.urls <- site.dat[site.dat$urlDescription %in% download.types,]
-    
-    # Make a note of how many files were downloaded
+    # Make a note of how many files we're downloading
     noaa.meta[i,"files.download"] <- nrow(data.urls)
-    
-    if(nrow(data.urls)==0) next 
     for(j in 1:nrow(data.urls)){
       download.file(data.urls$fileUrl[j], file.path(dir.out, data.urls$linkText[j]), quiet=T)
     } # End looping thorugh URL types
