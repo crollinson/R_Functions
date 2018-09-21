@@ -96,7 +96,7 @@ calc.soilmoist <- function(p, pe, awcs, awcu, ssgo, sugo) {
 	# ------------------------------------------
 	
 	# # Calculating a running deficit for diagnostics
-	# d.run <- rep(NaN, ntime)	
+	# d.run <- rep(NaN, ntime)
 	# d.run[1] <- d[1]
 	# for(i in 2:ntime){
 	#   d.run[i] <- d[i] + d.run[i-1]
@@ -118,7 +118,7 @@ calc.soilmoist <- function(p, pe, awcs, awcu, ssgo, sugo) {
 	#    4.4 Calculate recharge, loss, and runoff
 	# ------------------------------------------
 	for(i in 1:ntime){
-		dthis = d[i] # pe-p for right now
+		dthis = d[i] # pe-p for right now; 
 		
 		# -------------------------
 		# 4.1 Surface Layer Dynamics
@@ -136,17 +136,17 @@ calc.soilmoist <- function(p, pe, awcs, awcu, ssgo, sugo) {
 			
 			# Net Loss from sfc layer
 			if(dels[i] < 0){
-				es[i] <- -dels[i]
+				es[i] <- -dels[i] # Net Loss to ET
 			} else {
-				es[i] <- 0
+				es[i] <- 0 # Net loss to ET
 			}
 
 			excess[i] = 0
 		} else { # ppt exceeds pe, so our soils will get wetter (or stay at capacity)
 		  dels[i]   <- min(sempty[i], -dthis) # either all the precip, or as much as the soils can take in
 			rs[i]     <- dels[i] # surface recharge
-			excess[i] <- -dthis - dels[i] #
-			es[i]     <- 0			
+			excess[i] <- -dthis - dels[i] #excess; what can get shed to lower layer
+			es[i]     <- 0	# Net loss to ET
 		} # End surface balance ifelse
 		
 		ss1[i]  <- ss1this # save our starting point

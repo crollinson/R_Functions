@@ -153,7 +153,7 @@ PE.thorn <- function(Temp, yrs.calib, lat, dayz, dayfact, celcius=T){
    if(length(Lhot)>0) Temp2[Lhot] <- 38.0
    
    # Compute unadjusted PE; in mm/day; assumes 30 days per month
-   # PE = 16 * ((10.0 * Temp / I)^a)/30
+   # PE = 16 * ((10.0 * Temp / I)^a)/30 # mm/day
    PE = 16 * ((10.0 * Temp2 / I)^a) # mm/mo
    
    # Replace anything with Temp <=0, as 0
@@ -209,12 +209,12 @@ PE.thorn <- function(Temp, yrs.calib, lat, dayz, dayfact, celcius=T){
    # Calculating adjusted PE; will do leap year adjustment in 
    # next step to keep matrices smaller
    # Will return PE in mm/mo
-   PE <- PE*dayfact
 
-   if(ncol(PE)==12){
-     PE[yrs.leap,2] <- PE[yrs.leap,2] * 28/29
+   if(ncol(dayfact)==12){
+     dayfact[yrs.leap,2] <- dayfact[yrs.leap,2] * 28/29
    }
    
+   PE <- PE*dayfact
    
    # # Convert PE from mm to in
    PE <- PE*mm2in
